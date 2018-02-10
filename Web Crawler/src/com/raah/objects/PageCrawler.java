@@ -15,22 +15,25 @@ import com.raah.webcrawler.main.WebCrawler;
 
 public class PageCrawler {
 	private String _url;
-	private String _title;
 	private Document _document;
 	private Map<String, String> _linkList = new HashMap<String, String>();
 	private Map<String, String> _imageList  = new HashMap<String, String>();
 	
+	/**
+	 * Public method to load a web page using URL 
+	 * @param url requires a web site URL to
+	 * @return WebPage returns a parsed web page
+	 */
 	public WebPage loadPageDocumentFromURL(String url) {
 		this._url = url;
 		WebPage aPage = null;
 		if(connectToURL()){
-			_title = _document.title();
 			collectAllLinksFromPage();
 			collectAllImagesFromPage();
-			aPage = new WebPage(_url, true,_title, _linkList, _imageList);
+			aPage = new WebPage(_url, true,_document.title(), _linkList, _imageList);
 		}
 		return aPage;
-	}
+	} //end of method loadPageDocumentFromURL
 	
 	
 	/**
