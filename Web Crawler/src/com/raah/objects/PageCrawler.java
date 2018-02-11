@@ -1,8 +1,11 @@
 package com.raah.objects;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -15,9 +18,19 @@ import com.raah.webcrawler.main.WebCrawler;
 
 public class PageCrawler {
 	private String _url;
+	private final String _domainName;
+	private boolean _vistiStatus;
 	private Document _document;
 	private Map<String, String> _linkList = new HashMap<String, String>();
 	private Map<String, String> _imageList  = new HashMap<String, String>();
+	Map<String, String> _externalLinks = new HashMap<String, String>();
+	Map<String, String> _internalLinks = new HashMap<String, String>();
+	
+	public PageCrawler() {
+		this._vistiStatus = true;
+		this._domainName = getDomainNameFromURL(this._url);
+	} //end of constructor
+	
 	
 	/**
 	 * Public method to load a web page using URL 
@@ -26,11 +39,18 @@ public class PageCrawler {
 	 */
 	public WebPage loadPageDocumentFromURL(String url) {
 		this._url = url;
-		WebPage aPage = null;
+		WebPage aPage = null;		
 		if(connectToURL()){
-			collectAllLinksFromPage();
-			collectAllImagesFromPage();
-			aPage = new WebPage(_url, true,_document.title(), _linkList, _imageList);
+			collectAllLinks();
+			separeteInternaLinksFromExternalLinks();			
+			collectAllImages();			
+			aPage = new WebPage(_url, 
+								_vistiStatus,
+								_document.title(), 
+								_linkList, 
+								_imageList,
+								_externalLinks, 
+								_internalLinks);
 		}
 		return aPage;
 	} //end of method loadPageDocumentFromURL
@@ -60,7 +80,7 @@ public class PageCrawler {
 	 * Method to collect all URLs on the page
 	 * @return returns a map of URLs contained on the page
 	 */
-	private void collectAllLinksFromPage(){
+	public void collectAllLinks(){
 		if(this._document != null) {
 			Elements links = _document.select("a[href]");
 			//Enhanced loop as we are only reading the data
@@ -69,13 +89,13 @@ public class PageCrawler {
 			}
 		}
 	} //end of method collectAllLinksFromPage
-	
+
 	
 	/**
 	 * Method to collect all images on the page
 	 * @return return a map of images on the page
 	 */
-	private void collectAllImagesFromPage(){
+	private void collectAllImages(){
 		if(this._document != null) {
 			Elements images = _document.select("img[src~=(?i)\\.(png|jpe?g|gif)]");
 			for(Element img : images) {
@@ -83,4 +103,35 @@ public class PageCrawler {
 			}
 		}
 	} //end of method collectAllImagesFromPage
-}
+	
+	
+	/**
+	 * Method to separate internal links from external links. 
+	 */
+	private void separeteInternaLinksFromExternalLinks() {
+		for(Entry<String, String> entry : this._linkList.entrySet()) {
+			String entryDomainName = getDomainNameFromURL(entry.getValue());
+			if(entryDomainName.equalsIgnoreCase(this._domainName)) {
+				this._internalLinks.put(entry.getKey(), entry.getValue());
+			} else {
+				this._externalLinks.put(entry.getKey(), entry.getValue());
+			}				
+		}		
+	} //end of method separeteInternaLinksFromExternalLinks
+
+	/**
+	 * Method to get domain name from a given string
+	 * @param url requires the URL as String
+	 * @return returns the domain name from the URL
+	 */
+	private static String getDomainNameFromURL(String url) {				
+		try {
+			URL netUrl = new URL(url);
+			return netUrl.getHost();
+		} catch (MalformedURLException e) {			
+			e.printStackTrace();
+		}
+		return null;
+	} //end of method getDomainNameFromURL
+
+} //end of class

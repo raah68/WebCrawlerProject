@@ -8,13 +8,23 @@ public class WebPage {
 	private boolean visitStatus;
 	private Map<String, String> _pageLinks;
 	private Map<String, String> _imageLinks;
+	private Map<String, String> _internalLinks;
+	private Map<String, String> _externalLinks;
 	
-	public WebPage(String _url, boolean visitStatus, String _title, Map<String, String> pageLinks, Map<String, String> imageLinks) {
+	public WebPage(String _url, 
+				   boolean visitStatus, 
+				   String _title, 
+				   Map<String, String> pageLinks, 
+				   Map<String, String> imageLinks, 
+				   Map<String, String> internalLinks, 
+				   Map<String, String> externalLinks) {
 		this._url = _url;
 		this._title = _title;
 		this.visitStatus = visitStatus;
 		this._pageLinks = pageLinks;
 		this._imageLinks = imageLinks;
+		this._internalLinks = internalLinks;
+		this._externalLinks = externalLinks;
 	} //end of constructor
 
 	public String get_url() {
@@ -36,6 +46,16 @@ public class WebPage {
 	public Map<String, String> get_imageLinks() {
 		return _imageLinks;
 	}
+
+	public Map<String, String> get_internalLinks() {
+		return _internalLinks;
+	}
+
+	public Map<String, String> get_externalLinks() {
+		return _externalLinks;
+	}
+	
+	
 	
 	
 	
