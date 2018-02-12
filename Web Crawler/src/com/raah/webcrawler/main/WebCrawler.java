@@ -13,40 +13,41 @@ import com.raah.objects.WebPage;
 
 public class WebCrawler {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws MalformedURLException {
 		PageCrawler crawler = new PageCrawler();
-		//String url = "http://wiprodigital.com/";
-		//WebPage firstPage = crawler.loadPageDocumentFromURL(url);
-		//System.out.println(userInput());
-		//System.out.println(isURL("www.google.com"));
+		String url = "http://wiprodigital.com/";
+		WebPage firstPage = crawler.loadPageDocumentFromURL(url);
+		Map<String, String> internalLinks = firstPage.get_internalLinks();
+		Map<String, String> externalLinks = firstPage.get_externalLinks();
+		Map<String, String> allLinks = firstPage.get_pageLinks();
 		
-		String a = "go.com/";
-		String http = "http://";
-		if(!a.contains("://")) {
-			http = http.concat(a);
-			try {
-				URL url = new URL(http);
-				url.toURI();
-				System.out.println(http);
-			} catch (MalformedURLException e) {
-				System.out.println("not a valid URL");				
-			}
+		Map<String, String> images = firstPage.get_imageLinks();
+		String title = firstPage.get_title();
+		
+		for(Entry<String, String> entry : internalLinks.entrySet()) {
+			System.out.println(entry.getValue());
 		}
 		
+		//XMLCreator siteMap = new XMLCreator();
+		//siteMap.createXML(title, internalLinks,externalLinks, images);
 		
-		
+		//System.out.println(userInput());
+		//System.out.println(isURL("www.google.com"));
 		
 		
 		//System.out.println(firstPage.get_title());
 		//System.out.println(firstPage.get_url());
 		//System.out.println(firstPage.isVisitStatus());
 		
-/*		Map<String, String> pageLinks = firstPage.get_pageLinks();
-		for(Entry<String, String> entry : pageLinks.entrySet()) {
-			System.out.println(entry.getValue());		
-		}*/
+//		Map<String, String> pageLinks = firstPage.get_pageLinks();
+//		for(Entry<String, String> entry : pageLinks.entrySet()) {
+//			System.out.println(entry.getValue());		
+//		}
 		
-		/*Map<String, String> imageList = firstPage.get_imageLinks();
+
+		
+		
+		/*Map<String, Strings> imageList = firstPage.get_imageLinks();
 		 * 
 		System.out.println(imageList.entrySet().size());
 		for(Entry<String, String> entry: imageList.entrySet()) {
@@ -69,32 +70,20 @@ public class WebCrawler {
 				
 	} //end of method main
 	
-	public static URL userInput() {
-		System.out.println("Enter a web site address in the format of http://www. !");
+	public static String userInput() {
+		System.out.println("Enter a web site address (for example: http://wiprodigital.com/");
 		Scanner sc = new Scanner(System.in);
 		String inputString = sc.nextLine();
+		sc.close();
 		URL url = null;
-		if(inputString.length() > 0) {
-				
-			
-			if(isURL(inputString)) {
-				try {
-					url = new URL(inputString);
-				} catch (MalformedURLException e) {
-					System.out.println("Not a valild URL");
-					
-				}
+		if(inputString.length() > 0) {	
+			try {
+				url = new URL(inputString);
+			} catch (MalformedURLException e) {
+				System.out.println("Not a valild URL");		
 			} 
 		}										
-		return url;
+		return url.toString();
 	} //end of method userInput
-	
-	public static boolean isURL(String url) {
-		if (url == null) {
-	      return false;
-	    }
-	    String urlPattern = "^http(s{0,1})://[a-zA-Z0-9_/\\-\\.]+\\.([A-Za-z/]{2,5})[a-zA-Z0-9_/\\&\\?\\=\\-\\.\\~\\%]*";
-	    return url.matches(urlPattern);
-	}
 
 } //end of class

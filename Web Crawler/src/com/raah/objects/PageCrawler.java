@@ -23,8 +23,8 @@ public class PageCrawler {
 	private Document _document;
 	private Map<String, String> _linkList = new HashMap<String, String>();
 	private Map<String, String> _imageList  = new HashMap<String, String>();
-	Map<String, String> _externalLinks = new HashMap<String, String>();
-	Map<String, String> _internalLinks = new HashMap<String, String>();
+	private Map<String, String> _externalLinks = new HashMap<String, String>();
+	private Map<String, String> _internalLinks = new HashMap<String, String>();
 		
 	/**
 	 * Public method to load a web page using URL 
@@ -58,14 +58,14 @@ public class PageCrawler {
 	 * @param url  requires an URL to connect
 	 * @return returns a parsed HTML web page
 	 */
-	private boolean connectToURL() {	
+	public boolean connectToURL() {	
 		try {
-			this._document = Jsoup.connect(_url).get();			
+			_document = Jsoup.connect(_url).get();			
 		} catch (IOException ex) {
 			Logger.getLogger(WebCrawler.class.getName()).log(Level.SEVERE, null, ex);
 		}
 		
-		if(this._document != null) {
+		if(_document != null) {
 			return true;
 		} else {
 			return false;
@@ -78,11 +78,21 @@ public class PageCrawler {
 	 * @return returns a map of URLs contained on the page
 	 */
 	public void collectAllLinks(){
-		if(this._document != null) {
+		if(_document != null) {
 			Elements links = _document.select("a[href]");
+			Elements importedLinks = _document.select("link[href]");
+			
 			//Enhanced loop as we are only reading the data
 			for(Element link : links) {
-				this._linkList.put(link.text(), link.attr("href"));
+				if(link.text().length() > 0 ) {
+					_linkList.put(link.text(), link.absUrl("href"));
+				} else {
+					_linkList.put(link.attr("title").trim(), link.absUrl("href"));
+				}								
+			}
+			for(Element importedLink : importedLinks) {
+				_linkList.put(importedLink.attr("rel"), importedLink.absUrl("href"));
+				//_linkList.put(importedLink.text().trim(), importedLink.attr("abs:href"));
 			}
 		}
 	} //end of method collectAllLinksFromPage
@@ -92,11 +102,13 @@ public class PageCrawler {
 	 * Method to collect all images on the page
 	 * @return return a map of images on the page
 	 */
-	private void collectAllImages(){
-		if(this._document != null) {
-			Elements images = _document.select("img[src~=(?i)\\.(png|jpe?g|gif)]");
+	public void collectAllImages(){
+		if(_document != null) {
+			Elements images = _document.select("[src]");
 			for(Element img : images) {
-				_imageList.put(img.attr("alt"), img.attr("src"));
+				if(img.tagName().equals("img")) {
+					_imageList.put(img.attr("alt"), img.absUrl("src"));
+				}				
 			}
 		}
 	} //end of method collectAllImagesFromPage
@@ -105,14 +117,14 @@ public class PageCrawler {
 	/**
 	 * Method to separate internal links from external links. 
 	 */
-	private void separeteInternaLinksFromExternalLinks() {
-		for(Entry<String, String> entry : this._linkList.entrySet()) {			
+	public void separeteInternaLinksFromExternalLinks() {
+		for(Entry<String, String> entry : _linkList.entrySet()) {			
 			if(entry.getValue().startsWith("http")) {
 				String entryDomainName = getDomainNameFromURL(entry.getValue());				
-				if(entryDomainName.equalsIgnoreCase(this._domainName)) {
-					this._internalLinks.put(entry.getKey(), entry.getValue());
+				if(entryDomainName.equalsIgnoreCase(_domainName)) {
+					_internalLinks.put(entry.getKey(), entry.getValue());
 				} else {
-					this._externalLinks.put(entry.getKey(), entry.getValue());
+					_externalLinks.put(entry.getKey(), entry.getValue());
 				}				
 			}
 		}		
