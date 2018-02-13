@@ -1,5 +1,6 @@
 package com.raah.objects;
 
+import java.util.List;
 import java.util.Map;
 
 public class WebPage {
@@ -7,7 +8,7 @@ public class WebPage {
 	private String _title;
 	private boolean visitStatus;
 	private Map<String, String> _pageLinks;
-	private Map<String, String> _imageLinks;
+	private List<String> _imageLinks;
 	private Map<String, String> _internalLinks;
 	private Map<String, String> _externalLinks;
 	
@@ -15,7 +16,7 @@ public class WebPage {
 				   boolean visitStatus, 
 				   String _title, 
 				   Map<String, String> pageLinks, 
-				   Map<String, String> imageLinks, 
+				   List<String> imageLinks, 
 				   Map<String, String> internalLinks, 
 				   Map<String, String> externalLinks) {
 		this._url = _url;
@@ -43,7 +44,7 @@ public class WebPage {
 		return _pageLinks;
 	}
 	
-	public Map<String, String> get_imageLinks() {
+	public List<String> get_imageLinks() {
 		return _imageLinks;
 	}
 

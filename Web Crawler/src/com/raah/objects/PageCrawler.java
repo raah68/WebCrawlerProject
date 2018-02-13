@@ -3,7 +3,9 @@ package com.raah.objects;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -22,7 +24,7 @@ public class PageCrawler {
 	private boolean _vistiStatus;
 	private Document _document;
 	private Map<String, String> _linkList = new HashMap<String, String>();
-	private Map<String, String> _imageList  = new HashMap<String, String>();
+	private List<String> _imageList  = new ArrayList<String>();
 	private Map<String, String> _externalLinks = new HashMap<String, String>();
 	private Map<String, String> _internalLinks = new HashMap<String, String>();
 		
@@ -80,9 +82,8 @@ public class PageCrawler {
 	public void collectAllLinks(){
 		if(_document != null) {
 			Elements links = _document.select("a[href]");
-			Elements importedLinks = _document.select("link[href]");
-			
-			//Enhanced loop as we are only reading the data
+			Elements importedLinks = _document.select("link[href]");			
+			//Enhanced loop as we are only reading the data			
 			for(Element link : links) {
 				if(link.text().length() > 0 ) {
 					_linkList.put(link.text(), link.absUrl("href"));
@@ -91,8 +92,7 @@ public class PageCrawler {
 				}								
 			}
 			for(Element importedLink : importedLinks) {
-				_linkList.put(importedLink.attr("rel"), importedLink.absUrl("href"));
-				//_linkList.put(importedLink.text().trim(), importedLink.attr("abs:href"));
+				_linkList.put(importedLink.attr("rel"), importedLink.absUrl("href"));				
 			}
 		}
 	} //end of method collectAllLinksFromPage
@@ -104,11 +104,9 @@ public class PageCrawler {
 	 */
 	public void collectAllImages(){
 		if(_document != null) {
-			Elements images = _document.select("[src]");
+			Elements images = _document.getElementsByTag("img");
 			for(Element img : images) {
-				if(img.tagName().equals("img")) {
-					_imageList.put(img.attr("alt"), img.absUrl("src"));
-				}				
+				_imageList.add(img.attr("abs:src"));				
 			}
 		}
 	} //end of method collectAllImagesFromPage
