@@ -12,7 +12,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import java.io.File;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -26,56 +25,57 @@ public class XMLCreator {
 	 * @return - returns a newly created XML document
 	 * @throws ParserConfigurationException
 	 */
-	public Document createMainXMLDocument() throws ParserConfigurationException {
+	public DocumentBuilder createMainXMLDocument() throws ParserConfigurationException {
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = dbFactory.newDocumentBuilder();
-			Document doc = docBuilder.newDocument();
-			return doc;			
+			//Document doc = docBuilder.newDocument();
+			return docBuilder;			
 	} //end of method createMainXMLDocument
-
+	
 	/**
 	 * Method to add links and image element to the document
 	 * @param doc - requires a new document to append child to
-	 * @param pageName - requires the page name to create a root element 
+	 * @param pageURL - requires the page URL to create a root element 
 	 * @param internalLinks - requires a list of links to add to the XML document (internal links)
 	 * @param externalLink - requires a list of links to add to the XML document (external links)
 	 * @param images - requires a list of images to add to the XML document 
 	 * @return - returns the XML documents with the added child elements
 	 */
 	public Element addXMLElements(Document doc,
-						  String pageName, 
+						  String pageURL, 
 						  Map<String, String> internalLinks, 
 						  Map<String, String> externalLink, 
 						  List<String> images) 
 	{
-		Element rootElement = null;
+		Element subChildElement = null;
 		try {						
 			//Create root element
-			rootElement = doc.createElement(removeIllegalCharacters(pageName));
+			String elementName = getNameFromURL(pageURL);					
+			subChildElement = doc.createElement(removeIllegalCharacters(elementName));			
 			//doc.appendChild(rootElement);
 			
 			//Create link elements
 			if(internalLinks.size() > 0) {				
-				createLinkElements(_internalLinkElement, internalLinks, rootElement, doc);				
+				createLinkElements(_internalLinkElement, internalLinks, subChildElement, doc);				
 			} 
 			
 			//Create external link elements
 			if(externalLink.size() >0 ) {
-				createLinkElements(_externalLinkElement, externalLink, rootElement, doc);
+				createLinkElements(_externalLinkElement, externalLink, subChildElement, doc);
 			}
 							
 			//Create image elements 
 			if(images.size() > 0) {
-				createImageElements(_imageElement, images, rootElement, doc);
-			}					
-			return rootElement;
+				createImageElements(_imageElement, images, subChildElement, doc);
+			}
+			
+			return subChildElement;
 		} catch (Exception e) {
 			e.printStackTrace();			
 		}
-		return rootElement;
+		return null;
 	} //end of method createXML
-	
-	
+		
 	/**
 	 * Method to add the link URL to the XML document 
 	 * @param elementName - Name should appear at the root level
@@ -99,8 +99,7 @@ public class XMLCreator {
 		}
 		rootElement.appendChild(linkElement);
 	} //end of method createLinkElements
-	
-	
+		
 	/**
 	 * Method to add image elements to a given XML document
 	 * @param imageElementName - requires a name to formulate the element name
@@ -124,21 +123,34 @@ public class XMLCreator {
 	 * @return - returns a string after stripping out the illegal character
 	 */
 	public String removeIllegalCharacters(String targetString) {
-		return targetString.replaceAll("[^A-Za-z0-9()\\[\\]]", "");
+		//return targetString.replaceAll("[^A-Za-z0-9()\\[\\]]", "");
+		return targetString.replaceAll("\\W+","");
 	} //end of method removeIllegalCharacters
+		
+	/**
+	 * Method to obtain the last segment of a URL
+	 * @param url requires a URL to split in to segments
+	 * @return returns the last segment of a split URL
+	 */
+	public String getNameFromURL(String url) {
+		String segement[] = url.split("/");
+		return segement[segement.length-1];
+	} //end of method getNameFromURL
 	
 	/**
-	 * Method to write a XML document
+	 * Method to write the content in an XML file
 	 * @param doc - requires the document to write
 	 * @throws TransformerException
 	 */
-	public void writeDocument(Document doc) throws TransformerException {
-		//Write the content into XML file
+	public void writeDocument(Document doc) throws TransformerException {		
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
-		DOMSource source = new DOMSource(doc);
-		//StreamResult result = new StreamResult(new File("C:\\sitemap.xml"));
-		//transformer.transform(source, result);		
+		DOMSource source = new DOMSource(doc);	
+		//File fileSource = new File("C:\\Windows\\Temp\\output.xml");
+		//fileSource.setWritable(true);
+		//StreamResult result = new StreamResult(fileSource);
+		//transformer.transform(source, result);
+		//System.out.println("File writting has been completed, please check location: "+fileSource.getAbsolutePath()+" for results");
 		StreamResult consoleResult = new StreamResult(System.out);
         transformer.transform(source, consoleResult);        
 	} //end of method writeDocument	

@@ -1,6 +1,5 @@
 package com.raah.objects;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -8,15 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import com.raah.webcrawler.main.WebCrawler;
 
 public class PageCrawler {
 	private String _url;
@@ -37,8 +33,7 @@ public class PageCrawler {
 		this._url = url;
 		this._domainName = getDomainNameFromURL(this._url);
 		this._vistiStatus = true;				
-		WebPage aPage = null;
-		
+		WebPage aPage = null;		
 		if(connectToURL()){
 			collectAllLinks();
 			separeteInternaLinksFromExternalLinks();			
@@ -53,8 +48,7 @@ public class PageCrawler {
 		}
 		return aPage;
 	} //end of method loadPageDocumentFromURL
-	
-	
+		
 	/**
 	 * Method to connect to an URL and return the parsed HTML as document
 	 * @param url  requires an URL to connect
@@ -63,8 +57,8 @@ public class PageCrawler {
 	public boolean connectToURL() {	
 		try {
 			_document = Jsoup.connect(_url).get();			
-		} catch (IOException ex) {
-			Logger.getLogger(WebCrawler.class.getName()).log(Level.SEVERE, null, ex);
+		} catch (Exception e) {
+			System.out.println("The URL is not Valid");;			
 		}
 		
 		if(_document != null) {
@@ -73,8 +67,7 @@ public class PageCrawler {
 			return false;
 		}
 	} //end of method loadDocumentFromWeb
-	
-	
+		
 	/**
 	 * Method to collect all URLs on the page
 	 * @return returns a map of URLs contained on the page
@@ -96,7 +89,6 @@ public class PageCrawler {
 			}
 		}
 	} //end of method collectAllLinksFromPage
-
 	
 	/**
 	 * Method to collect all images on the page
@@ -110,14 +102,13 @@ public class PageCrawler {
 			}
 		}
 	} //end of method collectAllImagesFromPage
-	
-	
+		
 	/**
 	 * Method to separate internal links from external links. 
 	 */
 	public void separeteInternaLinksFromExternalLinks() {
 		for(Entry<String, String> entry : _linkList.entrySet()) {			
-			if(entry.getValue().startsWith("http")) {
+			if(entry.getValue().startsWith("http") && !entry.getValue().equalsIgnoreCase(_url)) {
 				String entryDomainName = getDomainNameFromURL(entry.getValue());				
 				if(entryDomainName.equalsIgnoreCase(_domainName)) {
 					_internalLinks.put(entry.getKey(), entry.getValue());
@@ -141,5 +132,23 @@ public class PageCrawler {
 			return null;
 		}
 	} //end of method getDomainNameFromURL
+	
+	/**
+	 * Method to validate URL by checking its response code
+	 * @param url requires a URL as a string
+	 * @return returns a the response code received for the URL
+	 */
+	public int validateURL(String url) {
+		//Document webPageDocument;
+		int status;
+		Connection.Response resp;
+		try {
+			resp = Jsoup.connect(url).execute();
+			status = resp.statusCode();
+		} catch (Exception e) {
+			status = 0;						
+		}		
+		return status;		
+	} //end of method validateURL
 
 } //end of class
