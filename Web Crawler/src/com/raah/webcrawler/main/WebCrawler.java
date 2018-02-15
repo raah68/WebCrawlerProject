@@ -22,6 +22,7 @@ public class WebCrawler {
 	
 	public static void main(String[] args) throws MalformedURLException {
 		url = userInput();
+		System.out.println("Please wait... generating output...");
 		crawler = new PageCrawler();
 		xmlDocCreator = new XMLCreator();
 		//Try creating the document
@@ -81,11 +82,11 @@ public class WebCrawler {
 	 * @return returns a Web site URL as a string
 	 */
 	public static String userInput() {
-		System.out.println("Enter a web site address (for example: http://wiprodigital.com");
+		System.out.println("Enter a web site address (for example: http://wiprodigital.com)");
 		Scanner sc = new 
 				Scanner(System.in);
 		String inputString = sc.nextLine();
-		sc.close();		
+		sc.close();
 		if(inputString.length() > 0) {	
 			try {
 				URL url = new URL(inputString);

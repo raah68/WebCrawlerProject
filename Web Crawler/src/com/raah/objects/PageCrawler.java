@@ -34,7 +34,7 @@ public class PageCrawler {
 		this._domainName = getDomainNameFromURL(this._url);
 		this._vistiStatus = true;				
 		WebPage aPage = null;		
-		if(connectToURL()){
+		if(connectToURL(_url)){
 			collectAllLinks();
 			separeteInternaLinksFromExternalLinks();			
 			collectAllImages();			
@@ -54,9 +54,9 @@ public class PageCrawler {
 	 * @param url  requires an URL to connect
 	 * @return returns a parsed HTML web page
 	 */
-	public boolean connectToURL() {	
+	public boolean connectToURL(String url) {	
 		try {
-			_document = Jsoup.connect(_url).get();			
+			_document = Jsoup.connect(url).get();			
 		} catch (Exception e) {
 			System.out.println("The URL is not Valid");;			
 		}

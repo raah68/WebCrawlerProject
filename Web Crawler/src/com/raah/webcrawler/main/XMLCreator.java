@@ -1,5 +1,6 @@
 package com.raah.webcrawler.main;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -146,13 +147,13 @@ public class XMLCreator {
 		TransformerFactory transformerFactory = TransformerFactory.newInstance();
 		Transformer transformer = transformerFactory.newTransformer();
 		DOMSource source = new DOMSource(doc);	
-		//File fileSource = new File("C:\\Windows\\Temp\\output.xml");
-		//fileSource.setWritable(true);
-		//StreamResult result = new StreamResult(fileSource);
-		//transformer.transform(source, result);
-		//System.out.println("File writting has been completed, please check location: "+fileSource.getAbsolutePath()+" for results");
-		StreamResult consoleResult = new StreamResult(System.out);
-        transformer.transform(source, consoleResult);        
+		File fileSource = new File("C:\\Windows\\Temp\\output.xml");
+		fileSource.setWritable(true);
+		StreamResult result = new StreamResult(fileSource);
+		transformer.transform(source, result);
+		System.out.println("An outpuit file has been created! Please check location: "+fileSource.getAbsolutePath()+" for results");
+		//StreamResult consoleResult = new StreamResult(System.out);
+        //transformer.transform(source, consoleResult);        
 	} //end of method writeDocument	
 
 } //end of class
